@@ -27,10 +27,12 @@ class notechain : public eosio::contract {
     }
 
     /// @abi table
-    struct notestruct {
+    struct deviceconfig {
       uint64_t      prim_key;  // primary key
       account_name  user;      // account name for the user
-      std::string   note;      // the note message
+      std::string   health;       // the note message
+      std::string   lat;       // the note message
+      std::string   lng;       // the note message
       uint64_t      timestamp; // the store the last update block time
 
       // primary key
@@ -48,7 +50,7 @@ class notechain : public eosio::contract {
     using contract::contract;
 
     /// @abi action
-    void update( account_name _user, std::string& _note ) {
+    void update( account_name _user, std::string& _health, std::string& _lat, std::string& _lng ) {
       // to sign the action with the given account
       require_auth( _user );
 
@@ -60,7 +62,9 @@ class notechain : public eosio::contract {
         obj.emplace( _self, [&]( auto& address ) {
           address.prim_key    = obj.available_primary_key();
           address.user        = _user;
-          address.note        = _note;
+          address.health      = _health;
+          address.lat         = _lat;
+          address.lng         = _lng;
           address.timestamp   = now();
         });
       } else {
@@ -69,7 +73,9 @@ class notechain : public eosio::contract {
         auto &note = notes.get(_user);
         // update object
         obj.modify( note, _self, [&]( auto& address ) {
-          address.note        = _note;
+          address.health      = _health;
+          address.lat         = _lat;
+          address.lng         = _lng;
           address.timestamp   = now();
         });
       }

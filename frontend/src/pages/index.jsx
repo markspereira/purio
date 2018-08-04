@@ -182,7 +182,7 @@ class Index extends Component {
               color="primary"
               className={classes.formButton}
               type="submit">
-              Add / Update note
+              Create
             </Button>
           </form>
         </Paper>
