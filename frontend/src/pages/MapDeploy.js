@@ -51,6 +51,12 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) =>
   </GoogleMap>
 ));
 
+// actionData: {
+//   _user: 'useraaaaaaae',
+//     _health: '1',
+//     _lat: '123',
+//     _lng: '456'
+// },
 
 
 
@@ -58,6 +64,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      color: 'rgb(127.5,127.5,0)',
+      showMarker: false,
       results: {},
       noteTable: [],
       modalIsOpen: false,
@@ -65,9 +73,7 @@ class App extends Component {
       actionAccount: 'useraaaaaaae',
       actionData: {
         _user: 'useraaaaaaae',
-        _health: '1',
-        _lat: '123',
-        _lng: '456'
+        _note: 'IOT-DEVICE-1',
       },
       privateKey: '5KE2UNPCZX5QepKcLpLXVCLdAw7dBfJFJnuCHhXUf61hPRMtUZg'
     };
@@ -76,9 +82,31 @@ class App extends Component {
     this.closeModal = this.closeModal.bind(this);
   }
 
+  componentDidMount() {
+    socket.on('value', (e) => this._changeColor(e))
+    this.getTable();
+  }
+
   openModal() {
     this.setState({modalIsOpen: true});
   }
+
+  _changeColor = (val) => {
+    let g = 255;
+    let r = 0;
+    let num = val - 1000;
+    if (num <= 6) {
+      this.setState({ color: `rgb(${0},${255},0.0)` });
+    } else if (num > 6 && num < 17) {
+      g = 255 - (num-6)/11*255;
+      r = (num-6)/6*255;
+      this.setState({ color: `rgb(${r},${g},0.0)` });
+    } else if (num >= 17) {
+      this.setState({ color: `rgb(${255},${0},0.0)` })
+    }
+
+
+  };
 
   afterOpenModal() {
     // references are now sync'd and can be accessed.
@@ -124,32 +152,12 @@ class App extends Component {
 
 
 
-  componentDidMount() {
-    this.getTable();
-  }
 
-  _sendData = async () => {
 
-    // // eosjs function call: connect to the blockchain
-    // const eos = Eos({keyProvider: privateKey});
-    // const result = await eos.transaction({
-    //   actions: [{
-    //     account: "notechainacc",
-    //     name: actionName,
-    //     authorization: [{
-    //       actor: account,
-    //       permission: 'active',
-    //     }],
-    //     data: actionData,
-    //   }],
-    // });
-    //
-    // console.log(result);
-    // this.getTable();
-  };
-
-  _openColorBox = () => {
-
+  _deployDevice = () => {
+    this.closeModal();
+    this._sendRequest();
+    this.setState({ showMarker: true })
   };
 
 
@@ -167,6 +175,9 @@ class App extends Component {
           <Typography component="pre">
             {note}
           </Typography>
+          <div className="box" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: 120, width: 120,}}>
+            <div style={{height: 100, width: 100, backgroundColor: this.state.color}}></div>
+          </div>
         </CardContent>
       </Card>
     );
@@ -255,7 +266,7 @@ class App extends Component {
         <div className="container">
           <div className="field">
             <MyMapComponent
-              isMarkerShown
+              isMarkerShown={this.state.showMarker}
               googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8xrZKKFJsEW35F4sjLg7vb2eAN2zU5Tk&v=3.exp&libraries=geometry,drawing,places"
               loadingElement={<div style={{ height: `100%` }} />}
               containerElement={<div style={{ height: `500px` }} />}
@@ -290,7 +301,7 @@ class App extends Component {
               </div>
               <div className="field">
                 <div className="control">
-                  <a className="button is-link is-hovered" onClick={this._openColorBox}>Deploy</a>
+                  <a className="button is-link is-hovered" onClick={this._deployDevice}>Deploy</a>
                 </div>
               </div>
 
