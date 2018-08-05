@@ -33,13 +33,13 @@ using namespace eosio;
 
 			/// @abi action
 			/// @param saccount sensor account sending the water health measurement
-			/// Note: if healt > 50 a payment of 1 PURIO will be issued to the paccount 
+			/// Note: if health > 50 a payment of 1 PURIO will be issued to the paccount 
 			///       linked to saccount when the create action was called
 			void updatehealth(account_name saccount, uint64_t  health ) {
 				// validating permissions
 				require_auth( saccount );
 
-				// get sensor data by pkey
+				// get sensor data by sensor account
 				auto sensor_data_itr = _sensor_data.find(saccount);
 				// check if the object exists
 				eosio_assert(sensor_data_itr != _sensor_data.end(), "Record was not found");
@@ -49,8 +49,10 @@ using namespace eosio;
 						});
 
 
+				// if health measurement is greater than 50
 				if(health > 50)
 				{         
+					// tranfer 1 PURIO to the paccount linked to the sensor account
 					asset quantity(10000,S(4,PURIO));
 					account_name paccount = _sensor_data.get(saccount).paccount;
 				 	action(
