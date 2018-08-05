@@ -73,7 +73,7 @@ class App extends Component {
       actionAccount: 'useraaaaaaae',
       actionData: {
         _user: 'useraaaaaaae',
-        _note: 'IOT-DEVICE-1',
+        _note: '',
       },
       privateKey: '5KE2UNPCZX5QepKcLpLXVCLdAw7dBfJFJnuCHhXUf61hPRMtUZg'
     };
@@ -147,7 +147,12 @@ class App extends Component {
       "scope": "notechainacc",  // scope of the table
       "table": "notestruct",    // name of the table as specified by the contract abi
       "limit": 100,
-    }).then(result => this.setState({ noteTable: result.rows }));
+    }).then(result => {
+      if (result.rows > 0) {
+        this.setState({ showMarker: true })
+      }
+      this.setState({ noteTable: result.rows })
+    });
   }
 
 
@@ -167,16 +172,19 @@ class App extends Component {
       <Card className={'card'} key={key}>
         <CardContent>
           <Typography variant="headline" component="h2">
-            {user}
+            Device
           </Typography>
-          <Typography style={{fontSize:12}} color="textSecondary" gutterBottom>
+          <Typography style={{fontSize:20}} color="textSecondary" gutterBottom>
             {new Date(timestamp*1000).toString()}
           </Typography>
           <Typography component="pre">
             {note}
           </Typography>
-          <div className="box" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: 120, width: 120,}}>
-            <div style={{height: 100, width: 100, backgroundColor: this.state.color}}></div>
+          <h6 className="title is-6" style={{marginTop: 15}}>Water Health Status</h6>
+          <div className="field">
+            <div className="box" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 120, width: 120,}}>
+              <div style={{height: 100, width: 100, backgroundColor: this.state.color}}></div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -241,9 +249,6 @@ class App extends Component {
                     <a className="bd-tw-button button" data-social-network="Twitter" data-social-action="tweet"
                        data-social-target="http://localhost:4000" target="_blank"
                        href="https://twitter.com/intent/tweet?text=Bulma: a modern CSS framework based on Flexbox&amp;hashtags=bulmaio&amp;url=http://localhost:4000&amp;via=jgthms">
-              <span className="icon">
-                <i className="fab fa-twitter"></i>
-              </span>
                       <span>
                 Tweet
               </span>
@@ -252,10 +257,7 @@ class App extends Component {
                   <p className="control">
                     <a className="button is-primary"
                        href="https://github.com/jgthms/bulma/releases/download/0.7.1/bulma-0.7.1.zip">
-              <span className="icon">
-                <i className="fas fa-download"></i>
-              </span>
-                      <span>Download</span>
+                      <span>Documentation</span>
                     </a>
                   </p>
                 </div>
@@ -280,7 +282,6 @@ class App extends Component {
         <div>
           <div className="field">
             <a onClick={this.openModal} className="button is-success" style={{marginTop: 10}}>Deploy IoT Device</a>
-            <a onClick={this._sendRequest} className="button is-success" style={{marginTop: 10}}>Make request</a>
           </div>
           <Modal
             isOpen={this.state.modalIsOpen}
@@ -290,13 +291,13 @@ class App extends Component {
             contentLabel="Example Modal"
           >
             <div className="container" style={{width: 500}}>
-              <div className="field">
-
+              <div className="field" style={{marginLeft: 460}}>
                 <a onClick={this.closeModal} className="button is-focused">X</a>
               </div>
+              <h3 className="title is-3" style={{marginTop: 15}}>Deploy your PURIO beacon</h3>
               <div className="field">
                 <div className="control">
-                  <input className="input is-primary" type="text" placeholder="Device name"/>
+                  <input className="input is-primary" type="text" value={this.state.actionData._note} placeholder="Device name" onChange={(e) => {this.setState({ actionData: { _user: 'useraaaaaaae', _note: e.target.value} })}}/>
                 </div>
               </div>
               <div className="field">
